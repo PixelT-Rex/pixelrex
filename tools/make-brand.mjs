@@ -1,11 +1,14 @@
-// Generates original PixelRex brand assets for X: avatar (400x400) + banner (1500x500).
+// Generates original PixelRex brand + repo assets:
+//   avatar (400x400), banner (1500x500), gameplay scene (1280x720), dino roster.
 import { createCanvas, GlobalFonts } from '@napi-rs/canvas'
 import { writeFileSync, mkdirSync } from 'node:fs'
+import { DINOS } from '../src/data/dinos.js'
 
 GlobalFonts.registerFromPath('C:/Windows/Fonts/consolab.ttf', 'ConsolasBold')
 GlobalFonts.registerFromPath('C:/Windows/Fonts/consola.ttf', 'Consolas')
 
-const OUT = 'D:/pixelrex-assets'
+// Write straight into the repo so the images are versioned & shown in the README.
+const OUT = 'brand'
 mkdirSync(OUT, { recursive: true })
 
 // brand green palette for the rex
@@ -36,6 +39,25 @@ function drawQuad(ctx, p, s, ox, oy) {
   P(4, 3, 2, 2, p.dark); P(7, 2, 2, 3, p.dark); P(10, 3, 2, 2, p.dark); P(0, 6, 2, 2, p.body)
   P(13, 4, 3, 3, p.body); P(15, 5, 2, 2, p.body); P(15, 4, 1, 1, p.eye)
   P(3, 10, 2, 3, p.dark); P(11, 10, 2, 2, p.dark); P(6, 10, 2, 2, p.dark); P(9, 10, 2, 3, p.dark)
+}
+
+function drawFlyer(ctx, p, s, ox, oy, flip = false) {
+  ctx.save()
+  if (flip) { ctx.translate(ox + 18 * s, oy); ctx.scale(-1, 1); ox = 0; oy = 0 }
+  const P = (x, y, w, h, c) => px(ctx, x, y, w, h, c, s, ox, oy)
+  P(6, 6, 5, 3, p.body); P(6, 8, 5, 1, p.dark)
+  P(10, 4, 3, 3, p.body); P(13, 5, 2, 1, p.claw); P(11, 5, 1, 1, p.eye); P(9, 3, 2, 1, p.dark)
+  P(1, 4, 6, 2, p.body); P(1, 6, 4, 1, p.belly); P(10, 4, 6, 2, p.body)
+  P(7, 9, 1, 2, p.dark); P(9, 9, 1, 2, p.dark)
+  ctx.restore()
+}
+
+const BODY = { raptor: 'biped', trex: 'biped', stego: 'quad', trike: 'quad', bronto: 'quad', ptero: 'flyer' }
+function drawDino(ctx, id, pal, s, ox, oy, flip = false) {
+  const t = BODY[id]
+  if (t === 'quad') drawQuad(ctx, pal, s, ox, oy)
+  else if (t === 'flyer') drawFlyer(ctx, pal, s, ox, oy, flip)
+  else drawRex(ctx, pal, s, ox, oy, flip)
 }
 
 function drawFern(ctx, s, ox, oy) {
@@ -169,6 +191,133 @@ function buildBanner() {
   console.log('banner -> pixelrex-banner.png (1500x500)')
 }
 
+// shared helpers for the framed images
+function pill(ctx, x, y, w, h, border, bg = '#0d1014cc', r = 4) {
+  ctx.fillStyle = bg; ctx.strokeStyle = border; ctx.lineWidth = 2
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill(); ctx.stroke()
+}
+function label(ctx, t, x, y, size, color, bold = false, align = 'left') {
+  ctx.font = `${size}px ${bold ? 'ConsolasBold' : 'Consolas'}`
+  ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'middle'
+  ctx.fillText(t, x, y); ctx.textAlign = 'left'
+}
+
+// =========================================================
+//  DINO ROSTER 1200x460
+// =========================================================
+function buildRoster() {
+  const W = 1200, H = 460
+  const c = createCanvas(W, H); const ctx = c.getContext('2d')
+  ctx.imageSmoothingEnabled = false
+  const g = ctx.createLinearGradient(0, 0, 0, H)
+  g.addColorStop(0, '#0d1014'); g.addColorStop(1, '#0a0d11')
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H)
+  ctx.fillStyle = '#6dbf5a10'
+  for (let x = 0; x < W; x += 22) for (let y = 0; y < H; y += 22) ctx.fillRect(x, y, 2, 2)
+
+  glowText(ctx, 'CHOOSE YOUR DINO', 40, 46, 34, '#cdeec8', '#6dbf5a')
+
+  const cols = 3, rows = 2, pad = 26, top = 86
+  const cw = (W - pad * (cols + 1)) / cols
+  const ch = (H - top - pad * rows) / rows
+  DINOS.forEach((d, i) => {
+    const cx = pad + (i % cols) * (cw + pad)
+    const cy = top + Math.floor(i / cols) * (ch + pad)
+    pill(ctx, cx, cy, cw, ch, d.tier === 'premium' ? '#ffb43266' : '#6dbf5a55', '#ffffff08', 8)
+    // sprite
+    const s = 7, gw = 18 * s, gh = 14 * s
+    drawDino(ctx, d.id, d.palette, s, cx + 24, cy + (ch - gh) / 2 - 6)
+    // text block
+    const tx = cx + 24 + gw + 18
+    label(ctx, d.name.toUpperCase(), tx, cy + 34, 21, '#c8e8b0', true)
+    label(ctx, d.tier === 'premium' ? `PREMIUM · ${d.price} PIXA` : 'FREE', tx, cy + 60, 14,
+      d.tier === 'premium' ? '#ffb020' : '#6dbf5a', true)
+    label(ctx, `HP ${d.stats.hp}`, tx, cy + 90, 15, '#8a8678')
+    label(ctx, `SPD ${d.stats.speed}`, tx, cy + 112, 15, '#8a8678')
+    label(ctx, `ATK ${d.stats.attack}`, tx, cy + 134, 15, '#8a8678')
+  })
+  writeFileSync(`${OUT}/roster.png`, c.toBuffer('image/png'))
+  console.log('roster -> roster.png (1200x460)')
+}
+
+// =========================================================
+//  GAMEPLAY SCENE 1280x720 (world + faux HUD)
+// =========================================================
+function buildScene() {
+  const W = 1280, H = 720
+  const c = createCanvas(W, H); const ctx = c.getContext('2d')
+  ctx.imageSmoothingEnabled = false
+  // sky
+  const g = ctx.createLinearGradient(0, 0, 0, H)
+  g.addColorStop(0, '#0a0d11'); g.addColorStop(0.62, '#10181c'); g.addColorStop(1, '#0d1014')
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H)
+  // stars
+  ctx.fillStyle = '#6dbf5a'
+  for (let i = 0; i < 80; i++) { ctx.globalAlpha = 0.08 + (i % 5) * 0.05; ctx.fillRect((i * 211) % W, (i * 97) % 360, 2, 2) }
+  ctx.globalAlpha = 1
+  // moon
+  ctx.fillStyle = '#e8d5a8'; ctx.beginPath(); ctx.arc(1090, 120, 40, 0, Math.PI * 2); ctx.fill()
+  // mountains
+  mountains(ctx, W, 540, 230, 170, '#16242c')
+  mountains(ctx, W, 560, 150, 110, '#1c3024')
+  // ground
+  const gy = 540
+  ctx.fillStyle = '#3a2e1e'; ctx.fillRect(0, gy, W, H - gy)
+  ctx.fillStyle = '#4a7a32'; ctx.fillRect(0, gy, W, 14)
+  ctx.fillStyle = '#3a6026'; ctx.fillRect(0, gy + 14, W, 5)
+  ctx.fillStyle = '#6dbf5a'; for (let x = 0; x < W; x += 28) ctx.fillRect(x + 5, gy + 4, 3, 3)
+  // actors
+  drawFern(ctx, 5, 300, 438)
+  drawFern(ctx, 4, 760, 458)
+  drawDino(ctx, 'raptor', DINOS[0].palette, 11, 150, gy - 154)             // player
+  drawDino(ctx, 'stego', DINOS[1].palette, 6, 560, gy - 84)
+  drawDino(ctx, 'ptero', DINOS[4].palette, 5, 980, 300, true)
+  // floating damage text for "action"
+  glowText(ctx, '-18', 640, 360, 26, '#ff5252', '#000')
+
+  // ---- faux HUD ----
+  // top-left brand
+  pill(ctx, 20, 20, 190, 38, '#6dbf5a');
+  const s2 = 2; drawRex(ctx, REX, s2, 30, 28)
+  label(ctx, 'PIXELREX', 76, 39, 19, '#cdeec8', true)
+  pill(ctx, 20, 66, 168, 26, '#c9a96a', '#0d101499'); label(ctx, 'CRETACEOUS VALLEY', 30, 79, 13, '#c9a96a', true)
+  // top-right stat pills
+  const sp = (x, lab, val, vc) => { pill(ctx, x, 20, 116, 38, '#2a2f38'); label(ctx, lab, x + 12, 39, 12, '#8a8678', true); label(ctx, val, x + 104, 39, 17, vc, true, 'right') }
+  sp(W - 20 - 116, 'PIXA', '1,840', '#c9a96a')
+  sp(W - 20 - 116 * 2 - 8, 'GOLD', '350', '#ffd54f')
+  pill(ctx, W - 20 - 116 * 2 - 8 - 132, 20, 124, 38, '#2a4a3a');
+  ctx.fillStyle = '#6dbf5a'; ctx.beginPath(); ctx.arc(W - 20 - 116 * 2 - 8 - 132 + 16, 39, 5, 0, 7); ctx.fill()
+  label(ctx, '32 ONLINE', W - 20 - 116 * 2 - 8 - 132 + 30, 39, 12, '#aee6a0', true)
+  // bottom-left player card
+  pill(ctx, 20, H - 116, 300, 96, '#2a2f38', '#0d1014cc', 6)
+  label(ctx, 'Thang', 36, H - 96, 17, '#ffffff', true)
+  label(ctx, 'Velo Raptor · Lv 2', 36, H - 74, 13, '#8a8678')
+  ctx.fillStyle = '#00000080'; ctx.fillRect(36, H - 58, 268, 18)
+  ctx.fillStyle = '#ff5252'; ctx.fillRect(36, H - 58, 268 * 0.62, 18)
+  label(ctx, '56 / 90 HP', 36 + 134, H - 49, 12, '#fff', true, 'center')
+  // bottom-center hotbar
+  const slots = 6, ss = 52, gap = 6
+  const hw = slots * ss + (slots - 1) * gap
+  let hx = (W - hw) / 2; const hy = H - 86
+  pill(ctx, hx - 8, hy - 8, hw + 16, ss + 16, '#2a2f38', '#0d1014cc', 4)
+  const hot = [['#b03030', '2'], ['#a02050', '4'], ['#e8d5a8', ''], ['#8a5a2e', ''], null, null]
+  for (let i = 0; i < slots; i++) {
+    ctx.fillStyle = '#00000080'; ctx.strokeStyle = i === 0 ? '#ffd54f' : '#3a3f48'; ctx.lineWidth = i === 0 ? 2 : 1
+    ctx.beginPath(); ctx.rect(hx, hy, ss, ss); ctx.fill(); ctx.stroke()
+    label(ctx, String(i + 1), hx + 5, hy + 9, 11, '#6dbf5a', true)
+    if (hot[i]) { ctx.fillStyle = hot[i][0]; ctx.fillRect(hx + 14, hy + 14, ss - 28, ss - 28); if (hot[i][1]) label(ctx, hot[i][1], hx + ss - 8, hy + ss - 9, 12, '#fff', true, 'right') }
+    hx += ss + gap
+  }
+  // bottom-right action buttons
+  const ab = (y, t, col) => { pill(ctx, W - 20 - 150, y, 150, 38, col, '#0d1014d9', 2); label(ctx, t, W - 20 - 75, y + 20, 14, '#cdeec8', true, 'center') }
+  ab(H - 154, 'ATTACK', '#e0563b'); ab(H - 108, 'DINOS', '#6dbf5a'); ab(H - 62, 'BAG', '#6dbf5a')
+
+  writeFileSync(`${OUT}/screenshot.png`, c.toBuffer('image/png'))
+  console.log('scene -> screenshot.png (1280x720)')
+}
+
 buildAvatar()
 buildBanner()
+buildRoster()
+buildScene()
 console.log('Done. Files in', OUT)
