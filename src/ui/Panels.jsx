@@ -4,6 +4,7 @@ import { itemIcon, dinoThumb } from './icons.js'
 import { ITEMS, ITEM_LIST } from '../data/items.js'
 import { QUESTS } from '../data/quests.js'
 import { DINOS } from '../data/dinos.js'
+import { LINKS } from '../links.js'
 
 export default function Panels() {
   const panel = useGame((s) => s.panel)
@@ -208,7 +209,12 @@ function Help() {
 const DOC_SECTIONS = [
   { id: 'about', t: 'About', body: (
     <><p><strong>PixelRex — Dino World</strong> is a pixel-art dinosaur survival sandbox. This build is an original single-player recreation.</p>
-    <p>Roam a side-scrolling Cretaceous valley, hunt, gather, trade and complete quests as one of six dinosaur species.</p></>
+    <p>Roam a side-scrolling Cretaceous valley, hunt, gather, trade and complete quests as one of six dinosaur species.</p>
+    <p style={{ marginTop: 10 }}>
+      <a className="doc-link" href={LINKS.x} target="_blank" rel="noreferrer">𝕏 @PixelxRex</a>
+      {'  ·  '}
+      <a className="doc-link" href={LINKS.github} target="_blank" rel="noreferrer">GitHub repo</a>
+    </p></>
   ) },
   { id: 'account', t: 'Account & Login', body: (
     <><p>Press <strong>Login</strong> on the start screen to link an account. This replaces the usual wallet connect: it grants you a wallet address, a PIXA balance, premium dino access and reward eligibility — exactly like a connected wallet.</p>

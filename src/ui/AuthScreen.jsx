@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useGame } from '../store.js'
 import { logoDataUrl } from './logo.js'
+import { LINKS } from '../links.js'
 
 export default function AuthScreen() {
   const login = useGame((s) => s.login)
@@ -38,6 +39,12 @@ export default function AuthScreen() {
 
         <div className="auth-divider">or</div>
         <button className="auth-btn" onClick={playAsGuest}>Play as guest</button>
+
+        <div className="auth-links">
+          <a className="auth-link" href={LINKS.x} target="_blank" rel="noreferrer">𝕏 @PixelxRex</a>
+          <span className="auth-link-sep">·</span>
+          <a className="auth-link" href={LINKS.github} target="_blank" rel="noreferrer">GitHub</a>
+        </div>
 
         <div className="auth-footer">
           Pixel dino survival · single-player demo build<br />
