@@ -316,8 +316,64 @@ function buildScene() {
   console.log('scene -> screenshot.png (1280x720)')
 }
 
+// =========================================================
+//  SOCIAL PREVIEW 1280x640 (shown when the repo/site link is pasted)
+// =========================================================
+function buildSocial() {
+  const W = 1280, H = 640
+  const c = createCanvas(W, H); const ctx = c.getContext('2d')
+  ctx.imageSmoothingEnabled = false
+  // sky
+  const g = ctx.createLinearGradient(0, 0, 0, H)
+  g.addColorStop(0, '#0a0d11'); g.addColorStop(0.6, '#10181c'); g.addColorStop(1, '#0d1014')
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H)
+  // center glow
+  const rg = ctx.createRadialGradient(W / 2, 250, 60, W / 2, 250, 620)
+  rg.addColorStop(0, '#6dbf5a22'); rg.addColorStop(1, '#0000'); ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H)
+  // stars
+  ctx.fillStyle = '#6dbf5a'
+  for (let i = 0; i < 90; i++) { ctx.globalAlpha = 0.08 + (i % 5) * 0.05; ctx.fillRect((i * 173) % W, (i * 91) % 360, 2, 2) }
+  ctx.globalAlpha = 1
+  // moon
+  ctx.fillStyle = '#e8d5a8'; ctx.beginPath(); ctx.arc(1110, 110, 40, 0, Math.PI * 2); ctx.fill()
+  ctx.fillStyle = '#0d1014'; ctx.beginPath(); ctx.arc(1092, 98, 34, 0, Math.PI * 2); ctx.fill()
+  // mountains + ground
+  mountains(ctx, W, 500, 240, 180, '#16242c')
+  mountains(ctx, W, 520, 160, 120, '#1c3024')
+  const gy = 500
+  ctx.fillStyle = '#3a2e1e'; ctx.fillRect(0, gy, W, H - gy)
+  ctx.fillStyle = '#4a7a32'; ctx.fillRect(0, gy, W, 14)
+  ctx.fillStyle = '#3a6026'; ctx.fillRect(0, gy + 14, W, 5)
+  ctx.fillStyle = '#6dbf5a'; for (let x = 0; x < W; x += 28) ctx.fillRect(x + 5, gy + 4, 3, 3)
+  // dinos along the ground
+  drawFern(ctx, 4, 250, 470)
+  drawDino(ctx, 'raptor', DINOS[0].palette, 8, 110, gy - 112)
+  drawDino(ctx, 'stego', DINOS[1].palette, 5, 470, gy - 70)
+  drawDino(ctx, 'trike', DINOS[2].palette, 5, 720, gy - 70)
+  drawDino(ctx, 'ptero', DINOS[4].palette, 4, 980, 250, true)
+  drawFern(ctx, 4, 900, 470)
+  // wordmark + tagline (centered)
+  ctx.textAlign = 'center'
+  glowText(ctx, 'PIXELREX', W / 2 - measure(ctx, 'PIXELREX', 110) / 2, 210, 110, '#cdeec8', '#6dbf5a')
+  ctx.fillStyle = '#6dbf5a'; ctx.fillRect(W / 2 - 260, 268, 520, 5)
+  label(ctx, 'D I N O   W O R L D', W / 2, 308, 26, '#c9a96a', true, 'center')
+  label(ctx, 'Pixel-art dinosaur survival · Vite + React + Phaser', W / 2, 344, 20, '#8a8678', false, 'center')
+  ctx.textAlign = 'left'
+  // vignette
+  const vg = ctx.createLinearGradient(0, 0, 0, H)
+  vg.addColorStop(0, '#0d101455'); vg.addColorStop(0.5, '#0000'); vg.addColorStop(1, '#0d101488')
+  ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H)
+
+  const buf = c.toBuffer('image/png')
+  writeFileSync(`${OUT}/social-preview.png`, buf)
+  mkdirSync('public', { recursive: true })
+  writeFileSync('public/social-preview.png', buf) // served by the site for OG tags
+  console.log('social -> social-preview.png (1280x640)')
+}
+
 buildAvatar()
 buildBanner()
 buildRoster()
 buildScene()
+buildSocial()
 console.log('Done. Files in', OUT)
