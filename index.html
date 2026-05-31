@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>PixelRex — Dino World</title>
+    <style>
+      html, body, #root {
+        margin: 0; padding: 0; width: 100%; height: 100%;
+        background: #0d1014; overflow: hidden;
+        font-family: 'Courier New', 'Menlo', monospace; color: #e8e3d3;
+      }
+      #game-root { position: absolute; inset: 0; }
+      #hud-root { position: absolute; inset: 0; z-index: 10; }
+      canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+      #boot {
+        position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        color: #6dbf5a; font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase; z-index: 20;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div id="boot">Loading the Cretaceous…</div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
