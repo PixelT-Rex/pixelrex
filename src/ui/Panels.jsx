@@ -5,6 +5,7 @@ import { ITEMS, ITEM_LIST } from '../data/items.js'
 import { QUESTS } from '../data/quests.js'
 import { DINOS } from '../data/dinos.js'
 import { LINKS } from '../links.js'
+import { GithubIcon, XIcon } from './Icons.jsx'
 
 export default function Panels() {
   const panel = useGame((s) => s.panel)
@@ -210,10 +211,9 @@ const DOC_SECTIONS = [
   { id: 'about', t: 'About', body: (
     <><p><strong>PixelRex — Dino World</strong> is a pixel-art dinosaur survival sandbox. This build is an original single-player recreation.</p>
     <p>Roam a side-scrolling Cretaceous valley, hunt, gather, trade and complete quests as one of six dinosaur species.</p>
-    <p style={{ marginTop: 10 }}>
-      <a className="doc-link" href={LINKS.x} target="_blank" rel="noreferrer">𝕏 @PixelxRex</a>
-      {'  ·  '}
-      <a className="doc-link" href={LINKS.github} target="_blank" rel="noreferrer">GitHub repo</a>
+    <p style={{ marginTop: 10, display: 'flex', gap: 16, alignItems: 'center' }}>
+      <a className="doc-link" href={LINKS.x} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><XIcon size={14} /> @PixelxRex</a>
+      <a className="doc-link" href={LINKS.github} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><GithubIcon size={15} /> GitHub repo</a>
     </p></>
   ) },
   { id: 'account', t: 'Account & Login', body: (

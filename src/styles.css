@@ -76,7 +76,7 @@ button { font-family: inherit; }
 .auth-divider { display: flex; align-items: center; gap: 10px; margin: 18px 0; color: var(--muted); font-size: 10px; letter-spacing: .2em; }
 .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
 .auth-links { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 18px; }
-.auth-link { color: var(--green); text-decoration: none; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; border-bottom: 1px dashed transparent; padding-bottom: 1px; }
+.auth-link { display: inline-flex; align-items: center; gap: 6px; color: var(--green); text-decoration: none; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; border-bottom: 1px dashed transparent; padding-bottom: 1px; }
 .auth-link:hover { color: var(--green-soft); border-bottom-color: var(--green); }
 .auth-link-sep { color: var(--muted); }
 .auth-footer { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--line); font-size: 9px; letter-spacing: .12em; color: #5a5e68; text-align: center; }

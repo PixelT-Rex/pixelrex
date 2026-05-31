@@ -371,9 +371,33 @@ function buildSocial() {
   console.log('social -> social-preview.png (1280x640)')
 }
 
+// =========================================================
+//  FAVICON / app icons (served from public/)
+// =========================================================
+function buildIcon(size, file) {
+  const c = createCanvas(size, size); const ctx = c.getContext('2d')
+  ctx.imageSmoothingEnabled = false
+  // rounded dark tile + glow
+  const r = Math.round(size * 0.18)
+  const g = ctx.createRadialGradient(size / 2, size / 2, size * 0.1, size / 2, size / 2, size * 0.7)
+  g.addColorStop(0, '#16241c'); g.addColorStop(1, '#0a0d11')
+  ctx.fillStyle = g; ctx.beginPath(); ctx.roundRect(0, 0, size, size, r); ctx.fill()
+  ctx.strokeStyle = '#6dbf5a'; ctx.lineWidth = Math.max(1, size * 0.04)
+  ctx.beginPath(); ctx.roundRect(ctx.lineWidth / 2, ctx.lineWidth / 2, size - ctx.lineWidth, size - ctx.lineWidth, r); ctx.stroke()
+  // centered rex (grid 18x14)
+  const s = Math.floor(size / 22)
+  const gw = 18 * s, gh = 14 * s
+  drawRex(ctx, REX, s, (size - gw) / 2, (size - gh) / 2)
+  mkdirSync('public', { recursive: true })
+  writeFileSync(`public/${file}`, c.toBuffer('image/png'))
+  console.log(`icon -> public/${file} (${size}x${size})`)
+}
+
 buildAvatar()
 buildBanner()
 buildRoster()
 buildScene()
 buildSocial()
+buildIcon(64, 'favicon.png')
+buildIcon(180, 'apple-touch-icon.png')
 console.log('Done. Files in', OUT)

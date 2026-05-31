@@ -6,6 +6,7 @@ import { DINO_BY_ID } from '../data/dinos.js'
 import Panels from './Panels.jsx'
 import Chat from './Chat.jsx'
 import { LINKS } from '../links.js'
+import { GithubIcon, XIcon } from './Icons.jsx'
 
 const fmt = (n) => n.toLocaleString('en-US')
 
@@ -53,8 +54,8 @@ export default function Hud() {
         )}
         <button className="icon-btn" onClick={() => s.openPanel('help')} title="Help">?</button>
         <button className="icon-btn" onClick={() => s.openPanel('docs')} title="Docs">📖</button>
-        <a className="icon-btn link" href={LINKS.x} target="_blank" rel="noreferrer" title="Follow on X">𝕏</a>
-        <a className="icon-btn link gh" href={LINKS.github} target="_blank" rel="noreferrer" title="GitHub">GH</a>
+        <a className="icon-btn link" href={LINKS.x} target="_blank" rel="noreferrer" title="Follow on X"><XIcon size={16} /></a>
+        <a className="icon-btn link" href={LINKS.github} target="_blank" rel="noreferrer" title="GitHub"><GithubIcon size={18} /></a>
         <button className="hud-exit" onClick={() => s.logout()}>Exit</button>
       </div>
 

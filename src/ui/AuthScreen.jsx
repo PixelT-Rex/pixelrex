@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useGame } from '../store.js'
 import { logoDataUrl } from './logo.js'
 import { LINKS } from '../links.js'
+import { GithubIcon, XIcon } from './Icons.jsx'
 
 export default function AuthScreen() {
   const login = useGame((s) => s.login)
@@ -41,9 +42,9 @@ export default function AuthScreen() {
         <button className="auth-btn" onClick={playAsGuest}>Play as guest</button>
 
         <div className="auth-links">
-          <a className="auth-link" href={LINKS.x} target="_blank" rel="noreferrer">𝕏 @PixelxRex</a>
+          <a className="auth-link" href={LINKS.x} target="_blank" rel="noreferrer"><XIcon size={13} /> @PixelxRex</a>
           <span className="auth-link-sep">·</span>
-          <a className="auth-link" href={LINKS.github} target="_blank" rel="noreferrer">GitHub</a>
+          <a className="auth-link" href={LINKS.github} target="_blank" rel="noreferrer"><GithubIcon size={14} /> GitHub</a>
         </div>
 
         <div className="auth-footer">
